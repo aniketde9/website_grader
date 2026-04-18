@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+logs/
+results.csv
+coverage/
+screenshots/
+.DS_Store

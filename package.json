@@ -1,0 +1,37 @@
+{
+  "name": "website-grader",
+  "version": "1.0.0",
+  "description": "CRO parameter grader for competitor websites scraped from ads",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "grade": "node src/index.js grade --input ads.csv --output results.csv",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "install:browsers": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.43.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "axios": "^1.7.2",
+    "csv-parse": "^5.5.5",
+    "csv-stringify": "^6.4.6",
+    "p-limit": "^4.0.0",
+    "dotenv": "^16.4.5",
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "color": "^4.2.3",
+    "cheerio": "^1.0.0-rc.12",
+    "winston": "^3.13.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nock": "^13.5.4"
+  }
+}
