@@ -362,10 +362,27 @@ async function collectPage(url, opts = {}) {
   });
 
   const doNavigate = async () => {
-    const response = await page.goto(url, {
-      waitUntil: 'networkidle',
-      timeout: timeoutMs
-    });
+    let response;
+    try {
+      response = await page.goto(url, {
+        waitUntil: 'networkidle',
+        timeout: timeoutMs
+      });
+    } catch (e) {
+      // Some pages keep background requests alive, so networkidle never resolves.
+      // Fall back to a less strict signal to avoid false timeouts.
+      if (/timeout/i.test(e.message || '')) {
+        logger.warn('Desktop navigation timed out on networkidle; retrying with domcontentloaded', {
+          url
+        });
+        response = await page.goto(url, {
+          waitUntil: 'domcontentloaded',
+          timeout: timeoutMs
+        });
+      } else {
+        throw e;
+      }
+    }
     if (skipNon200 && response && response.status() && response.status() >= 400) {
       const err = new Error(`HTTP ${response.status()}`);
       err.code = 'HTTP_ERROR';
