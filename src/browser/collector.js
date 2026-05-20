@@ -33,14 +33,15 @@ function popupInitScript() {
 }
 
 function extractInPage() {
-  const getText = el => (el ? el.innerText.trim() : '');
+  const textOf = el => String(el && el.innerText != null ? el.innerText : '').trim();
+  const getText = el => (el ? textOf(el) : '');
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
 
   const h1 = getText($('h1'));
   const h2 = getText($('h2'));
   const allHeadings = $$('h1,h2,h3')
-    .map(h => h.innerText.trim())
+    .map(h => textOf(h))
     .filter(Boolean);
 
   const vh = window.innerHeight;
@@ -49,14 +50,14 @@ function extractInPage() {
     return rect.top >= 0 && rect.top < vh && rect.bottom <= vh * 1.2;
   });
   const aboveFoldText = aboveFoldElements
-    .map(e => e.innerText)
+    .map(e => String(e && e.innerText != null ? e.innerText : ''))
     .join(' ')
     .slice(0, 3000);
 
   const buttonEls = $$(
     'button, input[type="submit"], a[class*="btn"], a[class*="cta"], [class*="button"]'
   );
-  const allButtonText = buttonEls.map(b => b.innerText.trim()).filter(Boolean);
+  const allButtonText = buttonEls.map(b => textOf(b)).filter(Boolean);
   const ctaInViewport = buttonEls.filter(b => {
     const r = b.getBoundingClientRect();
     return r.top >= 0 && r.bottom <= window.innerHeight;
@@ -92,7 +93,7 @@ function extractInPage() {
     const hasInlineValidation = inputs.some(
       input => typeof input.oninput === 'function' || typeof input.onblur === 'function'
     );
-    const formText = form.innerText.toLowerCase();
+    const formText = String(form.innerText != null ? form.innerText : '').toLowerCase();
     const hasPrivacyText = /no spam|privacy|unsubscribe|cancel anytime|won't share/.test(
       formText
     );
@@ -124,7 +125,9 @@ function extractInPage() {
   const hasNav = !!$('nav') || $$('[role="navigation"]').length > 0;
   const navLinkCount = $$('nav a, [role="navigation"] a').length;
 
-  const bodyText = document.body ? document.body.innerText : '';
+  const bodyText = document.body
+    ? String(document.body.innerText != null ? document.body.innerText : '')
+    : '';
   const hasCurrencyPattern = /\$[\d,]+|\£[\d,]+|€[\d,]+|\d+\/mo|\d+ per month/i.test(
     bodyText
   );
@@ -138,7 +141,7 @@ function extractInPage() {
   );
   const hasNameInTestimonial = testimonialContainers.some(tc => {
     const imgs = tc.querySelectorAll('img');
-    const text = tc.innerText;
+    const text = String(tc.innerText != null ? tc.innerText : '');
     return imgs.length > 0 && /[A-Z][a-z]+\s[A-Z][a-z]+/.test(text);
   });
 
@@ -161,7 +164,11 @@ function extractInPage() {
         const ctaEl = $('button, [class*="cta"]');
         if (!ctaEl) return false;
         const parent = ctaEl.closest('section') || ctaEl.parentElement;
-        return parent ? /money.back|guarantee|refund|risk.free/i.test(parent.innerText) : false;
+        return parent
+          ? /money.back|guarantee|refund|risk.free/i.test(
+              String(parent.innerText != null ? parent.innerText : '')
+            )
+          : false;
       })());
 
   const hasLeadMagnet =
@@ -171,7 +178,9 @@ function extractInPage() {
 
   const hasFAQ =
     !!$('[class*="faq"], [class*="accordion"]') ||
-    $$('h2,h3').some(h => /frequently asked|faq/i.test(h.innerText));
+    $$('h2,h3').some(h =>
+      /frequently asked|faq/i.test(String(h.innerText != null ? h.innerText : ''))
+    );
 
   const frictionPhrases =
     /no credit card|cancel anytime|no commitment|free forever|no obligation|try free|money.back/i;
@@ -191,7 +200,11 @@ function extractInPage() {
     'input[type="checkbox"], [class*="toggle"], [class*="switch"]'
   ).some(el => {
     const parent = el.closest('section') || el.parentElement;
-    return parent ? /annual|monthly|yearly|save|billing/i.test(parent.innerText) : false;
+    return parent
+      ? /annual|monthly|yearly|save|billing/i.test(
+          String(parent.innerText != null ? parent.innerText : '')
+        )
+      : false;
   });
 
   const hasPlanPersona =
@@ -216,7 +229,7 @@ function extractInPage() {
 
   const verbPattern =
     /^(get|start|try|book|claim|download|join|sign up|subscribe|schedule|request|discover|access|unlock|see|watch|learn|build|create)/i;
-  const ctaHasVerb = allButtonText.some(t => verbPattern.test(t.trim()));
+  const ctaHasVerb = allButtonText.some(t => verbPattern.test(String(t).trim()));
 
   const ctaInViewportCount = ctaInViewport.length;
 
